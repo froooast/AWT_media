@@ -3,6 +3,9 @@ import ReactDOM from "react-dom";
 import { Router, Route } from "react-router";
 import { DrizzleProvider } from "drizzle-react";
 
+//Stylesheets
+import './css/grommet.min.css'
+
 // Layouts
 import App from "./App";
 import { LoadingContainer } from "drizzle-react-components";

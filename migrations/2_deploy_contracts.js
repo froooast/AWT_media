@@ -1,16 +1,17 @@
-const Media = artifacts.require("Media");
+const MediaFactory = artifacts.require("MediaFactory");
 
 module.exports = function(deployer) {
-  deployer.deploy(Media);
+  deployer.deploy(MediaFactory);
 };
 
 module.exports = async deployer => {
-  await deployer.deploy(Media);
+  await deployer.deploy(MediaFactory);
 
   //set Media for dev
-  const media = await Media.deployed();
-  await media.addPeriod(
-    "PT0H0M12.500S",
-    "https://s3-eu-west-1.amazonaws.com/blockchain-puppies/test1/"
-  );
+  const media = await MediaFactory.deployed();
+  await media.createMedia("/puppy-preview", "Claras Welpenwunderland");
+  await media.createMedia("/pu123w", "C123rland");
+  await media.createMedia("/pu123423423423w", "C123r234234land");
+  await media.createMedia("/234234234pu123w", "C123r234234234234234land");
+
 };

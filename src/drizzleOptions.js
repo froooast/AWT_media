@@ -1,4 +1,4 @@
-import Media from "./../build/contracts/Media.json";
+import MediaFactory from "./../build/contracts/MediaFactory.json";
 
 const drizzleOptions = {
   web3: {
@@ -8,10 +8,10 @@ const drizzleOptions = {
       url: "ws://127.0.0.1:8545"
     }
   },
-  contracts: [Media],
-  // events: {
-  //  SimpleStorage: ["StorageSet"]
-  //},
+  contracts: [MediaFactory],
+  events: {
+    MediaFactory: ["MediaCreated", "PeriodCreated", "AdaptionSetCreated"]
+  },
   polls: {
     accounts: 1500
   }

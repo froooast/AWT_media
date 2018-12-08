@@ -2,18 +2,18 @@ import React, { Component } from "react";
 import { Route } from "react-router";
 import HomeContainer from "./layouts/home/HomeContainer";
 
-// Styles
-import "./css/oswald.css";
-import "./css/open-sans.css";
-import "./css/pure-min.css";
-import "./App.css";
+import { App as GrommetApp } from "grommet";
+import MediaHeader from "../src/MediaHeader";
+import MediaFooter from "../src/MediaFooter";
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
+      <GrommetApp>
+        <MediaHeader />
         <Route exact path="/" component={HomeContainer} />
-      </div>
+        <MediaFooter />
+      </GrommetApp>
     );
   }
 }

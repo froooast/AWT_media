@@ -1,11 +1,13 @@
 pragma solidity ^0.4.24;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 /**
  * @title Media contract
  * @dev Contains all Media function and properties.
  */
 
-contract Media {
+contract Media is Ownable{
     Period[] public periods;
 
     struct Period {
