@@ -26,8 +26,8 @@ class Player extends Component {
   initPlayer() {
     var player = new shaka.Player(this.refs.video);
 
-    var testManifest = js2XMLparser.parse("MPD", XMLObject);
-
+    var testManifest = this.props.manifest;
+    console.log(testManifest);
     // Listen for error events.
     player.addEventListener("error", this.onErrorEvent);
 

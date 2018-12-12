@@ -12,7 +12,7 @@ module.exports = async deployer => {
       instance.createMedia("Puppy-preview.jpg", "Clara's Puppyworld");
       instance.createPeriod(
         "PT0H0M12.500S",
-        "https://s3-eu-west-1.amazonaws.com/blockchain-puppies/test1/"
+        "http://localhost:3000/segment/QmSnNCfxL7R1ei8Dfk82gsEPykBZjC683iovaxaMxuE1WW/"
       );
       instance.createAdaptionSet(true, 1280, 720, 24, "16:9", "und");
       instance.createRepresentationSet(

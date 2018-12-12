@@ -28,6 +28,7 @@ class Home extends Component {
       //permits
       adaptionSet: [],
       representationSet: [],
+      manifest: null,
       isLoading: true
     };
     this.contracts = context.drizzle.contracts;
@@ -63,7 +64,7 @@ class Home extends Component {
         this.state.adaptionSet
       ) {
         this.setState({ isLoading: false });
-        this.prepareXML();
+        this.setState({ manifest: this.prepareXML() });
       }
     }
   }
@@ -159,6 +160,7 @@ class Home extends Component {
       this.state.representationSet.SegmentURL
     );
     var manifest = js2XMLparser.parse("MPD", XMLObject);
+    return manifest;
   }
 
   render() {
@@ -170,7 +172,7 @@ class Home extends Component {
           ) : (
             <div>
               <Headline align="center">{this.state.media.title}</Headline>
-              <Player />
+              <Player manifest={this.state.manifest} />
             </div>
           )}
         </Box>
@@ -181,11 +183,7 @@ class Home extends Component {
 
 Home.propTypes = {
   accounts: PropTypes.object,
-  Media: PropTypes.object,
-  mediaObject: PropTypes.object,
-  periodObject: PropTypes.object,
-  adaptionSetObject: PropTypes.object,
-  representationSetObject: PropTypes.object
+  manifest: PropTypes.string
 };
 
 Home.contextTypes = {
