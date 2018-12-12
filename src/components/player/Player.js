@@ -1,12 +1,11 @@
 import React, { Component } from "react";
 import shaka from "shaka-player";
-
 import js2XMLparser from "js2xmlparser";
 import { obj as XMLObject, createXML } from "../../util/parser";
 import xml from "../../../mpd/dash.mpd";
 
 class Player extends Component {
-  constructor(props, context) {
+  constructor(props) {
     super(props);
     this.state = {};
   }
@@ -14,7 +13,6 @@ class Player extends Component {
   componentDidMount() {
     // Install built-in polyfills to patch browser incompatibilities.
     shaka.polyfill.installAll();
-
     // Check to see if the browser supports the basic APIs Shaka needs.
     if (shaka.Player.isBrowserSupported()) {
       // Everything looks good!
@@ -40,7 +38,6 @@ class Player extends Component {
       .then(function() {
         // This runs if the asynchronous load is successful.
         console.log("The video has now been loaded!");
-        console.log(player.getConfiguration());
       })
       .catch(this.onError); // onError is executed if the asynchronous load fails.
   }

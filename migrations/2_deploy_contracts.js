@@ -5,13 +5,33 @@ module.exports = function(deployer) {
 };
 
 module.exports = async deployer => {
-  await deployer.deploy(MediaFactory);
-
-  //set Media for dev
-  const media = await MediaFactory.deployed();
-  await media.createMedia("/puppy-preview", "Claras Welpenwunderland");
-  await media.createMedia("/pu123w", "C123rland");
-  await media.createMedia("/pu123423423423w", "C123r234234land");
-  await media.createMedia("/234234234pu123w", "C123r234234234234234land");
-
+  deployer
+    .deploy(MediaFactory)
+    .then(() => MediaFactory.deployed())
+    .then(instance => {
+      instance.createMedia("Puppy-preview.jpg", "Clara's Puppyworld");
+      instance.createPeriod(
+        "PT0H0M12.500S",
+        "https://s3-eu-west-1.amazonaws.com/blockchain-puppies/test1/"
+      );
+      instance.createAdaptionSet(true, 1280, 720, 24, "16:9", "und");
+      instance.createRepresentationSet(
+        "video/mp4",
+        "avc1.4d401f",
+        "1:1",
+        1,
+        2412988,
+        24000,
+        96000,
+        [
+          "segment_init.mp4",
+          "segment_1.m4s",
+          "segment_2.m4s",
+          "segment_3.m4s",
+          "segment_4.m4s"
+        ],
+        1,
+        4
+      );
+    });
 };

@@ -36,12 +36,8 @@ contract MediaFactory is Ownable{
   }
 
   struct RepresentationSet {
-    uint id;
     string mimeType;
     string codecs;
-    uint width;
-    uint height;
-    uint frameRate;
     string sar;
     uint startWithSAP;
     uint bandwidth;
@@ -61,7 +57,8 @@ contract MediaFactory is Ownable{
   mapping (bytes32 => RepresentationSet) public representationsMapping;
 
   event MediaCreated (
-    bytes32 indexed mediaHash
+    bytes32 indexed mediaHash,
+    string baseURL
   );
 
   event PeriodCreated (
@@ -72,7 +69,7 @@ contract MediaFactory is Ownable{
     bytes32 indexed adaptionSetHash
   );
 
-  event RepresentationSeCreated (
+  event RepresentationSetCreated (
     bytes32 indexed representationHash
   );
 
@@ -96,9 +93,58 @@ contract MediaFactory is Ownable{
   )
     public
   {
-    _createMedia(
+    _createPeriod(
       _baseUrl,
       _duration
+    );
+  }
+
+  function createAdaptionSet(
+    
+    bool _segmentAlignment,
+    uint _maxWidth,
+    uint _maxHeight,
+    uint _maxFrameRate,
+    string _par,
+    string _lang
+  )
+    public
+  {
+    _createAdaptionSet(
+      _segmentAlignment,
+      _maxWidth,
+      _maxHeight,
+      _maxFrameRate,
+      _par,
+      _lang
+    );
+  }
+
+  function createRepresentationSet(
+    string _mimeType,
+    string _codecs,
+    string _sar,
+    uint _startWithSAP,
+    uint _bandwidth,
+    uint _timescale,
+    uint _duration,
+    bytes32[] _SegmentURL,
+    uint _representationCount,
+    uint _SegmentURLCount
+  )
+    public
+  {
+    _createRepresentationSet(
+      _mimeType,
+      _codecs,
+      _sar,
+      _startWithSAP,
+      _bandwidth,
+      _timescale,
+      _duration,
+      _SegmentURL,
+      _representationCount,
+      _SegmentURLCount
     );
   }
 
@@ -162,12 +208,8 @@ contract MediaFactory is Ownable{
     }
 
     function _getRepresentationHash(
-      uint _id,
       string _mimeType,
       string _codecs,
-      uint _width,
-      uint _height,
-      uint _frameRate,
       string _sar,
       uint _startWithSAP,
       uint _bandwidth,
@@ -180,12 +222,8 @@ contract MediaFactory is Ownable{
     {
       return keccak256(
         abi.encodePacked(
-              _id,
               _mimeType,
               _codecs,
-              _width,
-              _height,
-              _frameRate,
               _sar,
               _startWithSAP,
               _bandwidth,
@@ -222,7 +260,8 @@ contract MediaFactory is Ownable{
     mediasMapping[mediaHash] = media;
 
     emit MediaCreated(
-      mediaHash
+      mediaHash,
+      _title
     );
 
     // Increase the permit nonce to get continuously unique hash values.
@@ -316,14 +355,34 @@ contract MediaFactory is Ownable{
       adaptionHash
     );
   }
+
+  function getAdaptionSet(bytes32 _adaptionHash)
+    public
+    view
+    returns (
+      bool,
+      uint,
+      uint,
+      uint,
+      string,
+      string
+      )
+    {
+  
+    // Build a tuple with the attributes of the specimen object.
+    return (
+      adationsMapping[_adaptionHash].segmentAlignment,
+      adationsMapping[_adaptionHash].maxWidth,
+      adationsMapping[_adaptionHash].maxHeight,
+      adationsMapping[_adaptionHash].maxFrameRate,
+      adationsMapping[_adaptionHash].par,
+      adationsMapping[_adaptionHash].lang
+    );
+  }
   
   function _createRepresentationSet(
-    uint _id,
     string _mimeType,
     string _codecs,
-    uint _width,
-    uint _height,
-    uint _frameRate,
     string _sar,
     uint _startWithSAP,
     uint _bandwidth,
@@ -337,12 +396,8 @@ contract MediaFactory is Ownable{
   {
     for (uint i = 0; i < _representationCount; i++) {
       RepresentationSet memory representations = RepresentationSet({
-        id: _id,
         mimeType: _mimeType,
         codecs: _codecs,
-        width: _width,
-        height: _height,
-        frameRate: _frameRate,
         sar: _sar,
         startWithSAP: _startWithSAP,
         bandwidth: _bandwidth,
@@ -358,12 +413,8 @@ contract MediaFactory is Ownable{
       }
 
       bytes32 representationHash = _getRepresentationHash(
-        representations.id,
         representations.mimeType,
         representations.codecs,
-        representations.width,
-        representations.height,
-        representations.frameRate,
         representations.sar,
         representations.startWithSAP,
         representations.bandwidth,
@@ -373,6 +424,36 @@ contract MediaFactory is Ownable{
 
       representationsMapping[representationHash] = representations;
     }
+
+    emit RepresentationSetCreated(
+      representationHash
+    );
+  }
+
+  function getRepresentationSet(bytes32 _representationHash)
+    public
+    view
+    returns (
+      string,
+      string,
+      string,
+      uint,
+      uint,
+      uint,
+      bytes32[]
+    )
+  {
+  
+    // Build a tuple with the attributes of the specimen object.
+    return (
+      representationsMapping[_representationHash].mimeType,
+      representationsMapping[_representationHash].codecs,
+      representationsMapping[_representationHash].sar,
+      representationsMapping[_representationHash].bandwidth,
+      representationsMapping[_representationHash].timescale,
+      representationsMapping[_representationHash].duration,
+      representationsMapping[_representationHash].SegmentURL
+    );
   }
 
 }

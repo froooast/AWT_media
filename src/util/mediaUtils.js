@@ -6,13 +6,28 @@ export async function getMediaEvents(MediaFactory, eventName, fromBlock = 0) {
 }
 
 function _formatEvent(mediaEvent) {
+  let preHash = "";
   const { blockNumber, event, returnValues } = mediaEvent;
-  const { mediaHash, periodHash } = returnValues;
+  const {
+    mediaHash,
+    periodHash,
+    adaptionSetHash,
+    representationHash
+  } = returnValues;
   console.log(mediaEvent);
+  if (event === "MediaCreated") {
+    preHash = mediaHash;
+  } else if (event === "PeriodCreated") {
+    preHash = periodHash;
+  } else if (event === "AdaptionSetCreated") {
+    preHash = adaptionSetHash;
+  } else if (event === "RepresentationSetCreated") {
+    preHash = representationHash;
+  } else preHash = null;
   return {
     event,
     blockNumber,
-    hash: event === "MediaCreated" ? mediaHash : periodHash
+    hash: preHash
   };
 }
 
@@ -80,4 +95,47 @@ export function mergePeriodEvents(oldEvents, newEvents) {
       return c;
     }, {})
   );
+}
+
+//Daniels Utils
+export function parseRawMedia(rawMedia) {
+  return {
+    preview: rawMedia[0],
+    title: rawMedia[1]
+  };
+}
+
+export function parseRawPeriod(rawPeriod) {
+  return {
+    duration: rawPeriod[0],
+    baseUrl: rawPeriod[1]
+  };
+}
+
+export function parseRawAdaptionSet(rawAdaptionSet) {
+  return {
+    segmentAlignment: rawAdaptionSet[0],
+    maxWidth: rawAdaptionSet[1],
+    maxHeight: rawAdaptionSet[2],
+    maxFrameRate: rawAdaptionSet[3],
+    par: rawAdaptionSet[4],
+    lang: rawAdaptionSet[5]
+  };
+}
+
+export function parseRawRepresentationSet(rawAdaptionSet) {
+  const segments = rawAdaptionSet[6];
+  const segmentURL = [];
+  for (let i = 0; i < segments.length; i++) {
+    segmentURL[i] = utils.hexToUtf8(segments[i]);
+  }
+  return {
+    mimeType: rawAdaptionSet[0],
+    codecs: rawAdaptionSet[1],
+    sar: rawAdaptionSet[2],
+    bandwidth: rawAdaptionSet[3],
+    timescale: rawAdaptionSet[4],
+    duration: rawAdaptionSet[5],
+    SegmentURL: segmentURL
+  };
 }

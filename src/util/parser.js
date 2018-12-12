@@ -15,7 +15,7 @@ export const obj = {
       duration: "PT0H0M12.500S"
     },
     BaseURL: "https://s3-eu-west-1.amazonaws.com/blockchain-puppies/test1/",
-    AdaptionSet: {
+    AdaptationSet: {
       "@": {
         segmentAlignment: "true",
         maxWidth: "1280",
@@ -75,78 +75,89 @@ export const obj = {
 };
 
 export function createXML(
-  minBufferTime,
-  type,
-  mediaPresentationDuration,
-  maxSegmentDuration,
-  profiles
+  mediaTitle,
+  duration,
+  baseUrl,
+  segmentAlignment,
+  maxWidth,
+  maxHeight,
+  maxFrameRate,
+  par,
+  lang,
+  mimeType,
+  codecs,
+  sar,
+  bandwidth,
+  timescale,
+  representationDuration,
+  SegmentURL
 ) {
   var obj = {
     "@": {
       xmlns: "urn:mpeg:dash:schema:mpd:2011",
-      minBufferTime: minBufferTime,
-      type: type,
-      mediaPresentationDuration: mediaPresentationDuration,
-      maxSegmentDuration: maxSegmentDuration,
-      profiles: profiles
+      minBufferTime: "PT1.500S",
+      type: "static",
+      mediaPresentationDuration: "PT0H0M12.500S",
+      maxSegmentDuration: "PT0H0M4.000S",
+      profiles: "urn:mpeg:dash:profile:full:2011"
     },
     ProgramInformation: {
-      Title: "Puppy"
+      Title: mediaTitle
     },
     Period: {
       "@": {
-        duration: "PT0H0M12.500S"
+        duration: duration
       },
-      BaseURL: "https://s3-eu-west-1.amazonaws.com/blockchain-puppies/test1/",
+      BaseURL: baseUrl,
       AdaptationSet: {
         "@": {
-          segmentAlignment: "true",
-          maxWidth: "1280",
-          maxHeight: "720",
-          maxFrameRate: "24",
-          par: "16:9",
-          lang: "und"
+          segmentAlignment: segmentAlignment,
+          maxWidth: maxWidth,
+          maxHeight: maxHeight,
+          maxFrameRate: maxFrameRate,
+          par: par,
+          lang: lang
         },
         Representation: {
           "@": {
             id: "1",
-            mimeType: "video/mp4",
-            codecs: "avc1.4d401f",
+            mimeType: mimeType,
+            codecs: codecs,
             width: "1280",
             height: "720",
             frameRate: "24",
-            sar: "1:1",
+            sar: sar,
             startWithSAP: "1",
-            bandwidth: "2412988"
+            bandwidth: bandwidth
           },
           SegmentList: {
             "@": {
-              timescale: "24000",
-              duration: "96000"
+              timescale: timescale,
+              duration: representationDuration
             },
             Initialization: {
               "@": {
-                sourceURL: "segment_init.mp4"
+                sourceURL: SegmentURL[0]
               }
             },
             SegmentURL: {
               "@": {
-                media: "segment_1.m4s"
+                media: SegmentURL[1]
               }
             },
             SegmentURL: {
               "@": {
-                media: "segment_2.m4s"
+                media: SegmentURL[2]
               }
             },
             SegmentURL: {
               "@": {
-                media: "segment_3.m4s"
+                media: SegmentURL[3]
               }
             },
             SegmentURL: {
               "@": {
-                media: "segment_4.m4s"
+                media: SegmentURL[4]
               }
             }
           }
