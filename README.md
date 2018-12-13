@@ -78,3 +78,14 @@ npm run test
 ```
 npm run build
 ```
+
+## If you are sick of typing
+
+```
+npm run magic
+```
+And once your done
+```
+./ihatemagic.sh
+```
+Requires bash and screen. 
