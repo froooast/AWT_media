@@ -7,7 +7,7 @@ import { Box, Footer, Label, SocialShare } from "grommet";
 class MediaFooter extends Component {
   render() {
     return (
-      <Footer
+      <Footer style={{position: 'absolute', bottom: 0, left: 0}}
         direction="row"
         justify="between"
         separator="top"

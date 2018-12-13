@@ -9,7 +9,7 @@ module.exports = async deployer => {
     .deploy(MediaFactory)
     .then(() => MediaFactory.deployed())
     .then(instance => {
-      instance.createMedia("Puppy-preview.jpg", "Clara's Puppyworld");
+      instance.createMedia("Puppy-preview.jpg", "Viona's Puppyworld");
       instance.createPeriod(
         "PT0H0M12.500S",
         "http://localhost:4545/segment/QmSnNCfxL7R1ei8Dfk82gsEPykBZjC683iovaxaMxuE1WW/"
@@ -31,7 +31,7 @@ module.exports = async deployer => {
           "segment_4.m4s"
         ],
         1,
-        4
+        5
       );
     });
 };

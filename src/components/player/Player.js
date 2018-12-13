@@ -17,8 +17,8 @@ class Player extends Component {
     var testManifest = this.props.manifest;
     
     var player = dash.MediaPlayer().create();
-    player.initialize(document.querySelector("#videoPlayer"), url, true);
-    const url = "http://localhost:3000/manifest";
+    const url = "http://localhost:4545/manifest";
+    player.initialize(document.querySelector("#videoPlayer"), url, false);
     fetch(url, {
       method: "PUT", // *GET, POST, PUT, DELETE, etc.
       mode: "cors", // no-cors, cors, *same-origin

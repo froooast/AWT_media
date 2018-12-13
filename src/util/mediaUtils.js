@@ -14,7 +14,6 @@ function _formatEvent(mediaEvent) {
     adaptionSetHash,
     representationHash
   } = returnValues;
-  console.log(mediaEvent);
   if (event === "MediaCreated") {
     preHash = mediaHash;
   } else if (event === "PeriodCreated") {

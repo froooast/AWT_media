@@ -14,7 +14,7 @@ export const obj = {
     "@": {
       duration: "PT0H0M12.500S"
     },
-    BaseURL: "https://s3-eu-west-1.amazonaws.com/blockchain-puppies/test1/",
+    BaseURL: "http://localhost:4545/segment/QmSnNCfxL7R1ei8Dfk82gsEPykBZjC683iovaxaMxuE1WW/",
     AdaptationSet: {
       "@": {
         segmentAlignment: "true",
@@ -140,26 +140,28 @@ export function createXML(
                 sourceURL: SegmentURL[0]
               }
             },
-            SegmentURL: {
-              "@": {
-                media: SegmentURL[1]
-              }
-            },
-            SegmentURL: {
-              "@": {
-                media: SegmentURL[2]
-              }
-            },
-            SegmentURL: {
-              "@": {
-                media: SegmentURL[3]
-              }
-            },
-            SegmentURL: {
-              "@": {
-                media: SegmentURL[4]
-              }
-            }
+            SegmentURL: [
+              {
+                "@": {
+                  media: SegmentURL[1]
+                }
+              },
+              {
+                "@": {
+                  media: SegmentURL[2]
+                }
+              },
+              {
+                "@": {
+                  media: SegmentURL[3]
+                }
+              },
+              {
+                "@": {
+                  media: SegmentURL[4]
+                }
+              },
+            ]
           }
         }
       }
