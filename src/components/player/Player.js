@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import dash from "dashjs";
+import shaka from "shaka-player";
+import virtualIPFSGateway from "../../util/virtualIPFSGateway";
+import localManifestProvider from "../../util/localManifestProvider";
 
 class Player extends Component {
   constructor(props) {
@@ -8,40 +10,45 @@ class Player extends Component {
   }
 
   componentDidMount() {
-   
+    // Install built-in polyfills to patch browser incompatibilities.
+    shaka.polyfill.installAll();
+    // Check to see if the browser supports the basic APIs Shaka needs.
+    if (shaka.Player.isBrowserSupported()) {
+      // Everything looks good!
       this.initPlayer();
-    
+    } else {
+      // This browser does not have the minimum set of APIs we need.
+      console.error("Browser not supported!");
+    }
   }
-
   initPlayer() {
-    var testManifest = this.props.manifest;
-    
-    var player = dash.MediaPlayer().create();
-    const url = "http://localhost:4545/manifest";
-    player.initialize(document.querySelector("#videoPlayer"), url, false);
-    fetch(url, {
-      method: "PUT", // *GET, POST, PUT, DELETE, etc.
-      mode: "cors", // no-cors, cors, *same-origin
-      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-      redirect: "follow", // manual, *follow, error
-      referrer: "no-referrer", // no-referrer, *client
-      body: testManifest, // body data type must match "Content-Type" header  text/plain
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8"
-        // "Content-Type": "application/x-www-form-urlencoded",
-      }
-    }).then(_ => {
-      player.retrieveManifest(url, testManifest => {
-        player.attachSource(testManifest);
-      });
-    });
-  }
+    var player = new shaka.Player(this.refs.video);
+    player.addEventListener("error", this.onErrorEvent);
 
+    shaka.net.NetworkingEngine.registerScheme("ipfs", virtualIPFSGateway);
+    shaka.net.NetworkingEngine.registerScheme(
+      "js",
+      localManifestProvider(this.props.manifest)
+    );
+    const url = "js://manifest.mpd";
+    player
+      .load(url)
+      .then(function() {
+        console.log("The manifest was loaded into shaka");
+      })
+      .catch(err => console.error(err));
+  }
 
   render() {
     return (
       <div>
-        <video id="videoPlayer" controls />
+        <video
+          ref="video"
+          width="640"
+          poster="//shaka-player-demo.appspot.com/assets/poster.jpg"
+          controls
+          autoPlay
+        />
       </div>
     );
   }

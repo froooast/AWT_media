@@ -12,7 +12,7 @@ module.exports = async deployer => {
       instance.createMedia("Puppy-preview.jpg", "Viona's Puppyworld");
       instance.createPeriod(
         "PT0H0M12.500S",
-        "http://localhost:4545/segment/QmSnNCfxL7R1ei8Dfk82gsEPykBZjC683iovaxaMxuE1WW/"
+        "ipfs://QmSnNCfxL7R1ei8Dfk82gsEPykBZjC683iovaxaMxuE1WW/"
       );
       instance.createAdaptionSet(true, 1280, 720, 24, "16:9", "und");
       instance.createRepresentationSet(
