@@ -4,7 +4,7 @@
         <Title>Puppy</Title>
     </ProgramInformation>
     <Period duration='PT0H0M12.500S'>
-        <BaseURL>http://localhost:3000/segment/QmSnNCfxL7R1ei8Dfk82gsEPykBZjC683iovaxaMxuE1WW/</BaseURL>
+        <BaseURL>ipfs://QmSnNCfxL7R1ei8Dfk82gsEPykBZjC683iovaxaMxuE1WW/</BaseURL>
         <AdaptationSet segmentAlignment='true' maxWidth='1280' maxHeight='720' maxFrameRate='24' par='16:9' lang='und'>
             <Representation id='1' mimeType='video/mp4' codecs='avc1.4d401f' width='1280' height='720' frameRate='24' sar='1:1' startWithSAP='1' bandwidth='2412988'>
                 <SegmentList timescale='24000' duration='96000'>

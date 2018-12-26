@@ -3,6 +3,7 @@ import shaka from "shaka-player";
 import js2XMLparser from "js2xmlparser";
 import { obj as XMLObject, createXML } from "../../util/parser";
 import xml from "../../../mpd/dash.mpd";
+import virtualIPFSGateway from '../../util/virtualIPFSGateway'
 
 class Player extends Component {
   constructor(props) {
@@ -31,6 +32,7 @@ class Player extends Component {
     // Listen for error events.
     player.addEventListener("error", this.onErrorEvent);
 
+    shaka.net.NetworkingEngine.registerScheme("ipfs", virtualIPFSGateway);
     // Try to load a manifest.
     // This is an asynchronous process.
     player
