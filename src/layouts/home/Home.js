@@ -63,7 +63,7 @@ class Home extends Component {
         this.state.representationSet &&
         this.state.adaptionSet
       ) {
-        console.log("received all nescessary data!")
+        console.log("received all nescessary data!");
         this.setState({ isLoading: false });
         this.setState({ manifest: this.prepareXML() });
       }
@@ -108,7 +108,7 @@ class Home extends Component {
           .getMedia(event.hash)
           .call();
         const parsedMedia = parseRawMedia(rawMedia);
-        report(event.event, parsedMedia)
+        report(event.event, parsedMedia);
         this.setState({
           media: parsedMedia
         });
@@ -117,7 +117,7 @@ class Home extends Component {
           .getPeriod(event.hash)
           .call();
         const parsedPeriod = parseRawPeriod(rawPeriod);
-        report(event.event, parsedPeriod)
+        report(event.event, parsedPeriod);
         this.setState({
           period: parsedPeriod
         });
@@ -126,7 +126,7 @@ class Home extends Component {
           .getAdaptionSet(event.hash)
           .call();
         const parsedAdaptionSet = parseRawAdaptionSet(rawAdaptionSet);
-        report(event.event, parsedAdaptionSet)
+        report(event.event, parsedAdaptionSet);
         this.setState({
           adaptionSet: parsedAdaptionSet
         });
@@ -137,7 +137,7 @@ class Home extends Component {
         const parsedRepresentationSet = parseRawRepresentationSet(
           rawRepresentationSet
         );
-        report(event.event, parsedRepresentationSet)
+        report(event.event, parsedRepresentationSet);
         this.setState({
           representationSet: parsedRepresentationSet
         });
@@ -146,7 +146,7 @@ class Home extends Component {
   }
 
   prepareXML() {
-    console.log("Building Manifest!")
+    console.log("Building Manifest!");
     const xml = createXML(
       this.state.media.title,
       this.state.period.duration,
@@ -166,8 +166,6 @@ class Home extends Component {
       this.state.representationSet.SegmentURL
     );
     var manifest = js2XMLparser.parse("MPD", xml);
-    console.log("Manifest build. Result:")
-    console.log(manifest)
     return manifest;
   }
 
@@ -201,5 +199,5 @@ Home.contextTypes = {
 export default Home;
 
 function report(event, data) {
-  console.log(event+": "+JSON.stringify(data, 0, 2))
+  console.log(event + ": " + JSON.stringify(data, 0, 2));
 }

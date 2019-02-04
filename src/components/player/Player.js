@@ -2,6 +2,9 @@ import React, { Component } from "react";
 import shaka from "shaka-player";
 import virtualIPFSGateway from "../../util/virtualIPFSGateway";
 import localManifestProvider from "../../util/localManifestProvider";
+import localManifest from "../../../mpd/dash.mpd";
+import { obj } from "../../util/parser";
+import js2XMLparser from "js2xmlparser";
 
 class Player extends Component {
   constructor(props) {
@@ -31,8 +34,18 @@ class Player extends Component {
       localManifestProvider(this.props.manifest)
     );
     const url = "js://manifest.mpd";
+
+    var manifest = js2XMLparser.parse("MPD", obj, {
+      declaration: { encoding: "UTF-8" }
+    });
+    console.log("starting manifest");
+    console.log(manifest);
+
+    const url2 =
+      "https://irtdashreference-i.akamaihd.net/dash/live/901161/bfs/manifestARD.mpd";
+    const url3 = "https://dash.akamaized.net/envivio/EnvivioDash3/manifest.mpd";
     player
-      .load(url)
+      .load(manifest)
       .then(function() {
         console.log("The manifest was loaded into shaka");
       })

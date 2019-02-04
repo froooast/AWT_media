@@ -2,6 +2,7 @@ import shaka from "shaka-player";
 export default function(manifest) {
   const enc = new TextEncoder(); // always utf-8
   const encodedManifest = enc.encode(manifest);
+  console.log(manifest);
   return uri => {
     const result = {
       uri: uri,
