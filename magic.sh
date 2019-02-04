@@ -12,6 +12,7 @@ screen -S ipfs-daemon -dm ipfs daemon
 
 echo "adding files to ipfs"
 ipfs add -r ipfs/files/puppies
+ipfs add -r ipfs/files/dash_demo_video
 
 echo "starting frontend"
 npm run start

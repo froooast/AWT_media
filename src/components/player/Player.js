@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import shaka from "shaka-player";
 import virtualIPFSGateway from "../../util/virtualIPFSGateway";
 import localManifestProvider from "../../util/localManifestProvider";
-
+import manifest from "../../../mpd/dash.mpd"
 class Player extends Component {
   constructor(props) {
     super(props);
@@ -24,14 +24,15 @@ class Player extends Component {
   initPlayer() {
     var player = new shaka.Player(this.refs.video);
     player.addEventListener("error", this.onErrorEvent);
+    console.log(manifest)
     shaka.net.NetworkingEngine.registerScheme("ipfs", virtualIPFSGateway);
     shaka.net.NetworkingEngine.registerScheme(
       "js",
-      localManifestProvider(this.props.manifest)
+      localManifestProvider(manifest)//this.props.manifest)
     );
     const url = "js://manifest.mpd";
     player
-      .load(url)
+      .load(manifest)
       .then(function() {
         console.log("The manifest was loaded into shaka");
       })

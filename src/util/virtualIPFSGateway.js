@@ -7,7 +7,10 @@ node.on("ready", () => {
   // Ready to use!
   console.log("ipfs is ready");
   initialized = true;
-  //ipfsGet("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG", "quick-start").then(ans => console.log(ans[0].content))
+  /*node.files.ls('/ipfs/QmSTi5L9VC8chZdSKt7sEBNWpi74dVJKawZs8TPoNnhdcu', (err, ans) => console.log(err,ans))
+  node.files.ls('/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG', (err, ans) => console.log(err,ans))
+  node.files.ls('/ipfs/QmSnNCfxL7R1ei8Dfk82gsEPykBZjC683iovaxaMxuE1WW', (err, ans) => console.log(err,ans))*/
+  //ipfsGet("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/quick-start").then(ans => console.log(ans))
 });
 
 export default function(uri, request, requestType) {
@@ -24,7 +27,7 @@ export default function(uri, request, requestType) {
 async function loadSegment(uri) {
   const startTime = Date.now();
   try {
-    const path = uri.replace("ipfs://", "");
+    const path = uri.replace("ipfs:", "");
     const arrayBuffer = await ipfsGet(path);
     return {
       uri,
@@ -40,9 +43,13 @@ async function loadSegment(uri) {
 function ipfsGet(path) {
   console.log("fetch from ipfs: '" + path + "'");
   return new Promise((res, rej) => {
-    node.files.get(path, (err, files) => {
+    node.get(path, (err, files) => {
+      console.log("callback!")
+      console.log(err)
+      console.log(files)
       if (err) return rej(err);
       else {
+        console.log("fetch successful!")
         res(files[0].content);
       }
     });
