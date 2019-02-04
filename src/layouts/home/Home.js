@@ -7,6 +7,7 @@ import Spinning from "grommet/components/icons/Spinning";
 
 import js2XMLparser from "js2xmlparser";
 import { createXML } from "../../util/parser";
+import { obj } from "../../util/parser";
 
 import {
   parseRawMedia,
@@ -65,7 +66,11 @@ class Home extends Component {
       ) {
         console.log("received all nescessary data!");
         this.setState({ isLoading: false });
-        this.setState({ manifest: this.prepareXML() });
+        //this.setState({ manifest: this.prepareXML() });
+        const manifest = js2XMLparser.parse("MPD", obj, {
+          declaration: { encoding: "UTF-8" }
+        });
+        this.setState({ manifest });
       }
     }
   }
