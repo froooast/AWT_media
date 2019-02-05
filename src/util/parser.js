@@ -15,7 +15,7 @@ export const obj = {
     "@": {
       id: "period0"
     },
-    BaseURL: "https://dash.akamaized.net/envivio/EnvivioDash3/",
+    BaseURL: "ipfs://QmSTi5L9VC8chZdSKt7sEBNWpi74dVJKawZs8TPoNnhdcu",
     AdaptationSet: [
       {
         "@": {
@@ -30,8 +30,8 @@ export const obj = {
         SegmentTemplate: {
           "@": {
             timescale: "90000",
-            initialization: "$RepresentationID$-Header.m4s",
-            media: "$RepresentationID$-270146-i-$Number$.m4s",
+            initialization: "$RepresentationID$/Header.m4s",
+            media: "$RepresentationID$/$Number$.m4s",
             startNumber: "1",
             duration: "179704",
             presentationTimeOffset: "0"
@@ -158,8 +158,8 @@ export const obj = {
         SegmentTemplate: {
           "@": {
             timescale: "90000",
-            initialization: "$RepresentationID$-Header.m4s",
-            media: "$RepresentationID$-270146-i-$Number$.m4s",
+            initialization: "$RepresentationID$/Header.m4s",
+            media: "$RepresentationID$/$Number$.m4s",
             startNumber: "1",
             duration: "179704",
             presentationTimeOffset: "0"

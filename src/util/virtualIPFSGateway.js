@@ -27,7 +27,7 @@ export default function(uri, request, requestType) {
 async function loadSegment(uri) {
   const startTime = Date.now();
   try {
-    const path = uri.replace("ipfs:", "");
+    const path = uri.replace("ipfs:", "").replace("//", "");
     const arrayBuffer = await ipfsGet(path);
     return {
       uri,
@@ -35,18 +35,18 @@ async function loadSegment(uri) {
       timeMs: Date.now() - startTime
     };
   } catch (e) {
-    console.error("uncaught ipfs error");
     console.error(e);
+    throw e
   }
 }
 
-function ipfsGet(path) {
+function ipfsGet(path, timeout = 30000) {
   console.log("fetch from ipfs: '" + path + "'");
   return new Promise((res, rej) => {
+    const timer = setTimeout(() => res([]), timeout)
     node.get(path, (err, files) => {
       console.log("callback!")
-      console.log(err)
-      console.log(files)
+      clearTimeout(timer)
       if (err) return rej(err);
       else {
         console.log("fetch successful!")
