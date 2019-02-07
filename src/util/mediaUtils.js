@@ -1,5 +1,3 @@
-import { utils } from "web3";
-
 export async function getMediaEvents(MediaFactory, eventName, fromBlock = 0) {
   const events = await MediaFactory.getPastEvents(eventName, { fromBlock });
   return events.map(e => _formatEvent(e));

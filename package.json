@@ -1,5 +1,6 @@
 {
   "name": "drizzle-box",
+  "homepage": ".",
   "version": "1.0.0",
   "devDependencies": {
     "eslint": "^5.9.0",

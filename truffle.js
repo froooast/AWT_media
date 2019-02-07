@@ -3,6 +3,9 @@ const mnemonic = process.env.mnemonic
 console.log(mnemonic)
 module.exports = {
   migrations_directory: "./migrations",
+  mocha: {
+    enableTimeouts: false
+  },
   networks: {
     development: {
       host: "localhost",

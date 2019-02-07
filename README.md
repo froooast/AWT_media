@@ -91,6 +91,7 @@ And once your done
 Requires bash and screen. 
 
 ## Deploying contracts to rinkeby
+1. Install geth and 
 1. Start local ethereum client
 ```
 geth --rinkeby --rpc --rpcapi db,eth,net,web3,personal --unlock="0x86aFd5c660FD950200ba47a91921e8FB3d642193"

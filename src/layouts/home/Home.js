@@ -6,8 +6,7 @@ import Web3 from "web3";
 import Spinning from "grommet/components/icons/Spinning";
 
 import js2XMLparser from "js2xmlparser";
-import { createXML, createXMLManifest } from "../../util/parser";
-import { obj } from "../../util/parser";
+import { createXMLManifest } from "../../util/parser";
 
 import {
   parseRawMedia,
@@ -38,9 +37,9 @@ class Home extends Component {
     this.contracts = context.drizzle.contracts;
     this.web3 = new Web3(this.contracts.MediaFactory.givenProvider);
     const web3 = new Web3(this.contracts.MediaFactory.givenProvider);
-    const { abi, address } = this.contracts.MediaFactory;
-    const rightAddress = "0x0207e42b884255fa9b8001381896f6a2753ee297"
-    console.log("contract address", rightAddress)
+    const { abi } = this.contracts.MediaFactory;
+    // TODO: if you want to use this in develop change this line!
+    const rightAddress = "0x37b4b0b29d52904bf1f7defbbb831bf67adfacb3";
     this.MediaFactory = new web3.eth.Contract(abi, rightAddress);
   }
 
@@ -69,14 +68,14 @@ class Home extends Component {
         this.state.loadingSegmentTemplateDone &&
         this.state.loadingaudioChannelConfigurationSetDone
       ) {
-        console.log("received all nescessary data!");
+        console.log("received all nescessary data. Building Manifest");
         this.setState({ isLoading: false });
-       
+
         this.setState({ manifest: this.prepareXML(this.state.media) });
         //const manifest = js2XMLparser.parse("MPD", obj, {
-       //   declaration: { encoding: "UTF-8" }
-       // });
-      //  this.setState({ manifest });
+        //   declaration: { encoding: "UTF-8" }
+        // });
+        //  this.setState({ manifest });
       }
     }
   }
@@ -103,45 +102,46 @@ class Home extends Component {
 
   async getEventItems() {
     for (const event of this.state.mediaEvents) {
-      const rawMedia = await this.contracts.MediaFactory.methods
+      const rawMedia = await this.MediaFactory.methods
         .getMedia(event.hash)
         .call();
       const parsedMedia = parseRawMedia(rawMedia);
       this.getAdaptionSet(parsedMedia, event.hash);
-      report(event.event, parsedMedia);
+      console.log(`Media Period ${event.periodId} found at event ${event.hash}`)
+      console.log("fetching manifest raw data...")
       this.setState({
         media: parsedMedia
       });
-      console.log(this.state.media);
     }
   }
 
   async getAdaptionSet(media, hash) {
     var promises = [];
     for (var i = 0; i < media.numAdaptionSets; i++) {
-      promises.push(
-        this.contracts.MediaFactory.methods.getAdaptionSet(hash, i).call()
-      );
+      promises.push(this.MediaFactory.methods.getAdaptionSet(hash, i).call());
     }
 
     const results = await Promise.all(promises);
+    const subPromises = []
     for (const rawAdaptionSet of results) {
       const parsedAdaptionSet = parseRawAdaptionSet(rawAdaptionSet);
+      console.log(` - Found AdationSet ${parsedAdaptionSet.mimeType}`)
       this.state.media.adaptionSet.push(parsedAdaptionSet);
-      this.getRepresentations(
+      subPromises.push(...[this.getRepresentations(
         parsedAdaptionSet.mediaHash,
         parsedAdaptionSet.numAdaptionSet,
         parsedAdaptionSet.numRepresentation
-      );
+      ),
       this.getSegmentTemplate(
         parsedAdaptionSet.mediaHash,
         parsedAdaptionSet.numAdaptionSet
-      );
+      ),
       this.getAudioChannelConfiguration(
         parsedAdaptionSet.mediaHash,
         parsedAdaptionSet.numAdaptionSet
-      );
+      )])
     }
+    await Promise.all(subPromises)
     this.setState({ loadingAdaptionSetDone: true });
   }
 
@@ -149,14 +149,16 @@ class Home extends Component {
     var promises = [];
     for (var i = 0; i < numRepresentation; i++) {
       promises.push(
-        this.contracts.MediaFactory.methods
+        this.MediaFactory.methods
           .getRepresentationSet(mediaHash, numAdaptionSet, i)
           .call()
       );
     }
     const results = await Promise.all(promises);
     for (const rawRepresentation of results) {
+
       const parsedRepresentation = parseRawRepresentation(rawRepresentation);
+      console.log(`   - Found Representation ${parsedRepresentation.id}`)
       this.state.media.adaptionSet[numAdaptionSet].representationSet.push(
         parsedRepresentation
       );
@@ -165,10 +167,12 @@ class Home extends Component {
   }
 
   async getSegmentTemplate(mediaHash, numAdaptionSet) {
-    const rawSegmentTemplate = await this.contracts.MediaFactory.methods
+    const rawSegmentTemplate = await this.MediaFactory.methods
       .getSegmentTemplate(mediaHash, numAdaptionSet)
       .call();
     const parsedSegmentTemplate = parseRawSegmentTemplate(rawSegmentTemplate);
+
+    console.log(`   - Found SegmentTemplate ${parsedSegmentTemplate.media} ${parsedSegmentTemplate.initialization}`)
     this.state.media.adaptionSet[numAdaptionSet].segmentTemplateSet.push(
       parsedSegmentTemplate
     );
@@ -176,12 +180,14 @@ class Home extends Component {
   }
 
   async getAudioChannelConfiguration(mediaHash, numAdaptionSet) {
-    const rawAudioChannelConfiguration = await this.contracts.MediaFactory.methods
+    const rawAudioChannelConfiguration = await this.MediaFactory.methods
       .getAudioChannelConfiguration(mediaHash, numAdaptionSet)
       .call();
     const parsedAudioChannelConfiguration = parseRawAudioChannelConfiguration(
       rawAudioChannelConfiguration
     );
+    console.log(`   - Found AudioChannel ${parsedAudioChannelConfiguration.schemeIdUri}`)
+
 
     this.state.media.adaptionSet[
       numAdaptionSet
@@ -189,30 +195,6 @@ class Home extends Component {
 
     this.setState({ loadingaudioChannelConfigurationSetDone: true });
   }
-
-  /*prepareXML() {
-    console.log("Building Manifest!");
-    const xml = createXML(
-      this.state.media.title,
-      this.state.period.duration,
-      this.state.period.baseUrl,
-      this.state.adaptionSet.segmentAlignment,
-      this.state.adaptionSet.maxWidth,
-      this.state.adaptionSet.maxHeight,
-      this.state.adaptionSet.maxFrameRate,
-      this.state.adaptionSet.par,
-      this.state.adaptionSet.lang,
-      this.state.representationSet.mimeType,
-      this.state.representationSet.codecs,
-      this.state.representationSet.sar,
-      this.state.representationSet.bandwidth,
-      this.state.representationSet.timescale,
-      this.state.representationSet.duration,
-      this.state.representationSet.SegmentURL
-    );
-    var manifest = js2XMLparser.parse("MPD", xml);
-    return manifest;
-  }*/
 
   prepareXML(object) {
     const xml = createXMLManifest(object);
@@ -249,6 +231,3 @@ Home.contextTypes = {
 
 export default Home;
 
-function report(event, data) {
-  console.log(event + ": " + JSON.stringify(data, 0, 2));
-}

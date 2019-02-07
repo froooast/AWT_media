@@ -24,10 +24,8 @@ class Player extends Component {
     var player = new shaka.Player(this.refs.video);
     player.addEventListener("error", this.onErrorEvent);
     shaka.net.NetworkingEngine.registerScheme("ipfs", virtualIPFSGateway);
-    shaka.net.NetworkingEngine.registerScheme(
-      "js",
-      localManifestProvider(this.props.manifest)
-    );
+    shaka.net.NetworkingEngine.registerScheme("js", localManifestProvider(this.props.manifest));
+    
     const url = "js://manifest.mpd";
     player
       .load(url)

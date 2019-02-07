@@ -17,7 +17,7 @@ ReactDOM.render(
   <DrizzleProvider options={drizzleOptions} store={store}>
     <LoadingContainer>
       <Router history={history} store={store}>
-        <Route exact path="/" component={App} />
+        <Route component={App} />
       </Router>
     </LoadingContainer>
   </DrizzleProvider>,
