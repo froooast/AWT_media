@@ -89,3 +89,14 @@ And once your done
 ./ihatemagic.sh
 ```
 Requires bash and screen. 
+
+## Deploying contracts to rinkeby
+1. Start local ethereum client
+```
+geth --rinkeby --rpc --rpcapi db,eth,net,web3,personal --unlock="0x86aFd5c660FD950200ba47a91921e8FB3d642193"
+```
+2. Wait for it to sync.
+3. Run migrations
+```
+truffle migrate --network rinkeby
+```

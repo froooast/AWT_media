@@ -36,7 +36,9 @@ class Home extends Component {
     this.web3 = new Web3(this.contracts.MediaFactory.givenProvider);
     const web3 = new Web3(this.contracts.MediaFactory.givenProvider);
     const { abi, address } = this.contracts.MediaFactory;
-    this.MediaFactory = new web3.eth.Contract(abi, address);
+    const rightAddress = "0x0207e42b884255fa9b8001381896f6a2753ee297"
+    console.log("contract address", rightAddress)
+    this.MediaFactory = new web3.eth.Contract(abi, rightAddress);
   }
 
   async componentDidMount() {

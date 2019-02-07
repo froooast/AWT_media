@@ -1,3 +1,6 @@
+const HDWalletProvider = require("truffle-hdwallet-provider");
+const mnemonic = process.env.mnemonic
+console.log(mnemonic)
 module.exports = {
   migrations_directory: "./migrations",
   networks: {
@@ -8,10 +11,11 @@ module.exports = {
     },
     rinkeby: {
       network_id: 4,
-      host: "127.0.0.1",
-      from: "0x86aFd5c660FD950200ba47a91921e8FB3d642193",
-      port: 8545,   // Different than the default below
-      gas: 100000
+      provider: function() {
+        return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/e99f3fcc570c4ce78e4250395ea8ba6a")
+      },
+      //gas: 400000,
+      //from: "0x780586164CA6850570708426BEdd9C7496F75553"
     }
   }, 
   solc: {

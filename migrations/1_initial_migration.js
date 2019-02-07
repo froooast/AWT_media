@@ -1,5 +1,7 @@
 var Migrations = artifacts.require("Migrations");
 
-module.exports = function(deployer) {
-  deployer.deploy(Migrations);
+module.exports = async function(deployer) {
+  console.log("trying to deploy migrations")
+  await deployer.deploy(Migrations);
+  console.log("success!")
 };
