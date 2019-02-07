@@ -6,27 +6,13 @@ export async function getMediaEvents(MediaFactory, eventName, fromBlock = 0) {
 }
 
 function _formatEvent(mediaEvent) {
-  let preHash = "";
   const { blockNumber, event, returnValues } = mediaEvent;
-  const {
-    mediaHash,
-    periodHash,
-    adaptionSetHash,
-    representationHash
-  } = returnValues;
-  if (event === "MediaCreated") {
-    preHash = mediaHash;
-  } else if (event === "PeriodCreated") {
-    preHash = periodHash;
-  } else if (event === "AdaptionSetCreated") {
-    preHash = adaptionSetHash;
-  } else if (event === "RepresentationSetCreated") {
-    preHash = representationHash;
-  } else preHash = null;
+  const { mediaHash } = returnValues;
+
   return {
     event,
     blockNumber,
-    hash: preHash
+    hash: mediaHash
   };
 }
 
@@ -37,6 +23,7 @@ function _formatEvent(mediaEvent) {
  * @returns {Promise<number[]>} Array of events with UNIX timestamps in ms.
  */
 export async function blockNumberToUnix(web3, events) {
+
   const blocks = await Promise.all(
     events.map(e => web3.eth.getBlock(e.blockNumber, false))
   );
@@ -99,42 +86,78 @@ export function mergePeriodEvents(oldEvents, newEvents) {
 //Daniels Utils
 export function parseRawMedia(rawMedia) {
   return {
-    preview: rawMedia[0],
-    title: rawMedia[1]
-  };
-}
-
-export function parseRawPeriod(rawPeriod) {
-  return {
-    duration: rawPeriod[0],
-    baseUrl: rawPeriod[1]
+    periodID: rawMedia[0],
+    mediaPresentationDuration: rawMedia[1],
+    maxSegmentDuration: rawMedia[2],
+    minBufferTime: rawMedia[3],
+    profiles: rawMedia[4],
+    baseURL: rawMedia[5],
+    numAdaptionSets: rawMedia[6],
+    adaptionSet: []
   };
 }
 
 export function parseRawAdaptionSet(rawAdaptionSet) {
+  if (rawAdaptionSet[0] === "video/mp4") {
+    return {
+      mimeType: rawAdaptionSet[0],
+      maxWidth: rawAdaptionSet[1],
+      maxHeight: rawAdaptionSet[2],
+      maxFrameRate: rawAdaptionSet[3],
+      numRepresentation: rawAdaptionSet[4],
+      mediaHash: rawAdaptionSet[5],
+      numAdaptionSet: rawAdaptionSet[6],
+      representationSet: [],
+      segmentTemplateSet: [],
+      audioChannelConfigurationSet: []
+    };
+  } else {
+    return {
+      mimeType: rawAdaptionSet[0],
+      numRepresentation: rawAdaptionSet[4],
+      mediaHash: rawAdaptionSet[5],
+      numAdaptionSet: rawAdaptionSet[6],
+      representationSet: [],
+      segmentTemplateSet: [],
+      audioChannelConfigurationSet: []
+    };
+  }
+}
+
+export function parseRawRepresentation(rawRepresentation) {
+  if (rawRepresentation[2] === "mp4a.40.2") {
+    return {
+      id: rawRepresentation[0],
+      bandwidth: rawRepresentation[1],
+      codecs: rawRepresentation[2],
+      audioSamplingRate: rawRepresentation[5]
+    };
+  } else
+    return {
+      id: rawRepresentation[0],
+      bandwidth: rawRepresentation[1],
+      codecs: rawRepresentation[2],
+      width: rawRepresentation[3],
+      height: rawRepresentation[4]
+    };
+}
+
+export function parseRawSegmentTemplate(rawSegmentTemplate) {
   return {
-    segmentAlignment: rawAdaptionSet[0],
-    maxWidth: rawAdaptionSet[1],
-    maxHeight: rawAdaptionSet[2],
-    maxFrameRate: rawAdaptionSet[3],
-    par: rawAdaptionSet[4],
-    lang: rawAdaptionSet[5]
+    timescale: rawSegmentTemplate[0],
+    initialization: rawSegmentTemplate[1],
+    media: rawSegmentTemplate[2],
+    startNumber: rawSegmentTemplate[3],
+    duration: rawSegmentTemplate[4],
+    presentationTimeOffset: rawSegmentTemplate[5]
   };
 }
 
-export function parseRawRepresentationSet(rawAdaptionSet) {
-  const segments = rawAdaptionSet[6];
-  const segmentURL = [];
-  for (let i = 0; i < segments.length; i++) {
-    segmentURL[i] = utils.hexToUtf8(segments[i]);
-  }
+export function parseRawAudioChannelConfiguration(
+  rawAudioChannelConfiguration
+) {
   return {
-    mimeType: rawAdaptionSet[0],
-    codecs: rawAdaptionSet[1],
-    sar: rawAdaptionSet[2],
-    bandwidth: rawAdaptionSet[3],
-    timescale: rawAdaptionSet[4],
-    duration: rawAdaptionSet[5],
-    SegmentURL: segmentURL
+    schemeIdUri: rawAudioChannelConfiguration[0],
+    value: rawAudioChannelConfiguration[1]
   };
 }

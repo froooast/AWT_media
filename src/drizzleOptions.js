@@ -10,7 +10,7 @@ const drizzleOptions = {
   },
   contracts: [MediaFactory],
   events: {
-    MediaFactory: ["MediaCreated", "PeriodCreated", "AdaptionSetCreated"]
+    MediaFactory: ["MediaCreated"]
   },
   polls: {
     accounts: 1500

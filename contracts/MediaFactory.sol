@@ -34,9 +34,13 @@ contract MediaFactory is Ownable{
         uint maxHeight;
         string maxFrameRate;
         uint numRepresentation;
- //       mapping(uint => Representation) representationSets;
+        mapping(uint => Representation) representationSets;
+        uint numSegmentTemplate;
+        mapping(uint => SegmentTemplate) segmentTemplateSets;
+        uint numAudioChannelConfiguration;
+        mapping(uint => AudioChannelConfiguration) audioChannelConfigurationSets;
     }
-  /*
+  
     struct Representation {
         string id;
         uint bandwidth;
@@ -46,9 +50,9 @@ contract MediaFactory is Ownable{
         string frameRate;
         string audioSamplingRate;
     }
-
+    
     struct SegmentTemplate {
-        string timescale;
+        uint timescale;
         string initialization;
         string media;
         uint startNumber;
@@ -56,11 +60,11 @@ contract MediaFactory is Ownable{
         uint presentationTimeOffset;
 
     }
-
+    
     struct AudioChannelConfiguration {
         string schemeIdUri;
         uint value;
-    } */
+    } 
      /*
     * Global Variables
     */
@@ -111,7 +115,7 @@ contract MediaFactory is Ownable{
             _maxFrameRate
         );
     }
-    /*
+    
     //public function to add a representation to a adaptionSet
     function addRepresentationToAdaptionSet(
         string _id,
@@ -136,7 +140,45 @@ contract MediaFactory is Ownable{
             _audioSamplingRate
         );
     }
-*/
+
+    //piblic function to add a segmentTemplate to a AdaptionSet
+    function addSegmentTemplateToAdationSet(
+        uint _timescale,
+        string _initialization,
+        string _media,
+        uint _startNumber,
+        uint _duration,
+        bytes32 _mediaHash,
+        uint _numAdaptionSets,
+        uint _presentationTimeOffset
+    ) public {
+        _addSegmentTemplateToAdationSet(
+            _timescale,
+            _initialization,
+            _media,
+            _startNumber,
+            _duration,
+            _mediaHash,
+            _numAdaptionSets,
+            _presentationTimeOffset
+        );
+    }
+
+    //public function to add AudioChannelConfiguration to AdationSet
+    function addAudioChannelConfiguration(
+        string _schemeIdUri,
+        uint _value,
+        bytes32 _mediaHash,
+        uint _numAdaptionSets
+    ) public {
+        _addAudioChannelConfiguration(
+            _schemeIdUri,
+            _value,
+            _mediaHash,
+            _numAdaptionSets
+        );
+    }
+
     //create a unique mediaHash
     function _getMediaHash(
         string _periodID,
@@ -188,17 +230,19 @@ contract MediaFactory is Ownable{
     function getAdaptionSet(bytes32 _mediaHash, uint numAdaptionSet)
     public
     view
-    returns (string, uint, uint, string, uint)
+    returns (string, uint, uint, string, uint, bytes32, uint)
     {
         return (
             mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].mimeType,
             mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].maxWidth,
             mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].maxHeight,
             mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].maxFrameRate,
-            mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].numRepresentation
+            mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].numRepresentation,
+            _mediaHash,
+            numAdaptionSet
         );
     }
-    /*
+    
     // public function to get a AdaptionSet out of a MPD
     function getRepresentationSet(bytes32 _mediaHash, uint numAdaptionSet, uint numRepresentationSet)
     public
@@ -214,7 +258,35 @@ contract MediaFactory is Ownable{
             mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].representationSets[numRepresentationSet].audioSamplingRate
         );
     }
-  */
+
+    // public function to get a AdaptionSet out of a MPD
+    function getSegmentTemplate(bytes32 _mediaHash, uint numAdaptionSet)
+    public
+    view
+    returns (uint, string, string, uint, uint, uint)
+    {
+        return (
+            mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].segmentTemplateSets[0].timescale,
+            mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].segmentTemplateSets[0].initialization,
+            mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].segmentTemplateSets[0].media,
+            mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].segmentTemplateSets[0].startNumber,
+            mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].segmentTemplateSets[0].duration,
+            mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].segmentTemplateSets[0].presentationTimeOffset
+        );
+    }
+
+     // public function to get a AdaptionSet out of a MPD
+    function getAudioChannelConfiguration(bytes32 _mediaHash, uint numAdaptionSet)
+    public
+    view
+    returns (string, uint)
+    {
+        return (
+            mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].audioChannelConfigurationSets[0].schemeIdUri,
+            mediasMapping[_mediaHash].adaptionSets[numAdaptionSet].audioChannelConfigurationSets[0].value
+        );
+    }
+  
   /**
   * @dev Creates a media and stores it in the contract.
   * @dev A hash of the media is used as an unique key.
@@ -281,7 +353,9 @@ contract MediaFactory is Ownable{
             maxWidth: _maxWidth,
             maxHeight: _maxHeight,
             maxFrameRate: _maxFrameRate,
-            numRepresentation: 0
+            numRepresentation: 0,
+            numSegmentTemplate: 0,
+            numAudioChannelConfiguration: 0
         });
     }
 
@@ -290,7 +364,7 @@ contract MediaFactory is Ownable{
   * @dev Creates a Representation and stores it in the adaptionSet.
   * @dev A hash of the media is used as an unique key.
   */
-  /*
+  
     function _addRepresentationToAdaptionSet(
         string _id,
         uint _bandwidth,
@@ -314,5 +388,49 @@ contract MediaFactory is Ownable{
             audioSamplingRate: _audioSamplingRate
         });
     }
+
+     /**
+  * @dev Creates a Segment and stores it in the adaptionSet.
+  * @dev A hash of the media is used as an unique key.
   */
+  
+    function _addSegmentTemplateToAdationSet(
+        uint _timescale,
+        string _initialization,
+        string _media,
+        uint _startNumber,
+        uint _duration,
+        bytes32 _mediaHash,
+        uint _numAdaptionSets,
+        uint _presentationTimeOffset
+    ) private {
+        Media storage media = mediasMapping[_mediaHash];
+        uint number = media.adaptionSets[_numAdaptionSets].numSegmentTemplate++;
+        media.adaptionSets[_numAdaptionSets].segmentTemplateSets[number] = SegmentTemplate({
+            timescale: _timescale,
+            initialization: _initialization,
+            media: _media,
+            startNumber: _startNumber,
+            duration: _duration,
+            presentationTimeOffset: _presentationTimeOffset
+        });
+    }
+
+  /**
+  * @dev Creates a AudioChannelConfiguration and stores it in the adaptionSet.
+  * @dev A hash of the media is used as an unique key.
+  */
+    function _addAudioChannelConfiguration(
+        string _schemeIdUri,
+        uint _value,
+        bytes32 _mediaHash,
+        uint _numAdaptionSets
+    ) private {
+        Media storage media = mediasMapping[_mediaHash];
+        uint number = media.adaptionSets[_numAdaptionSets].numAudioChannelConfiguration++;
+        media.adaptionSets[_numAdaptionSets].audioChannelConfigurationSets[number] = AudioChannelConfiguration({
+            schemeIdUri: _schemeIdUri,
+            value: _value
+        });
+    }
 }

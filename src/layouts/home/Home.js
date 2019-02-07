@@ -6,15 +6,16 @@ import Web3 from "web3";
 import Spinning from "grommet/components/icons/Spinning";
 
 import js2XMLparser from "js2xmlparser";
-import { createXML } from "../../util/parser";
+import { createXML, createXMLManifest } from "../../util/parser";
 import { obj } from "../../util/parser";
 
 import {
   parseRawMedia,
-  parseRawPeriod,
   parseRawAdaptionSet,
+  parseRawRepresentation,
+  parseRawSegmentTemplate,
+  parseRawAudioChannelConfiguration,
   mergeMediaEvents,
-  parseRawRepresentationSet,
   getMediaEvents,
   blockNumberToUnix
 } from "../../util/mediaUtils";
@@ -27,8 +28,10 @@ class Home extends Component {
       mediaEvents: [],
       latestBlock: 0,
       //permits
-      adaptionSet: [],
-      representationSet: [],
+      loadingAdaptionSetDone: false,
+      loadingRepresentationSetDone: false,
+      loadingSegmentTemplateDone: false,
+      loadingaudioChannelConfigurationSetDone: false,
       manifest: null,
       isLoading: true
     };
@@ -59,39 +62,29 @@ class Home extends Component {
   componentDidUpdate() {
     if (this.state.isLoading) {
       if (
-        this.state.media &&
-        this.state.period &&
-        this.state.representationSet &&
-        this.state.adaptionSet
+        this.state.loadingAdaptionSetDone &&
+        this.state.loadingRepresentationSetDone &&
+        this.state.loadingSegmentTemplateDone &&
+        this.state.loadingaudioChannelConfigurationSetDone
       ) {
         console.log("received all nescessary data!");
         this.setState({ isLoading: false });
-        //this.setState({ manifest: this.prepareXML() });
-        const manifest = js2XMLparser.parse("MPD", obj, {
-          declaration: { encoding: "UTF-8" }
-        });
-        this.setState({ manifest });
+       
+        this.setState({ manifest: this.prepareXML(this.state.media) });
+        //const manifest = js2XMLparser.parse("MPD", obj, {
+       //   declaration: { encoding: "UTF-8" }
+       // });
+      //  this.setState({ manifest });
       }
     }
   }
 
   async getMediaEvents(from = 0) {
-    const [
-      createdMedia,
-      createdPeriod,
-      createdAdaption,
-      createdRepresentationSet
-    ] = await Promise.all([
-      getMediaEvents(this.MediaFactory, "MediaCreated", from),
-      getMediaEvents(this.MediaFactory, "PeriodCreated", from),
-      getMediaEvents(this.MediaFactory, "AdaptionSetCreated", from),
-      getMediaEvents(this.MediaFactory, "RepresentationSetCreated", from)
+    const [createdMedia] = await Promise.all([
+      getMediaEvents(this.MediaFactory, "MediaCreated", from)
     ]);
 
-    const events = createdMedia
-      .concat(createdPeriod)
-      .concat(createdAdaption)
-      .concat(createdRepresentationSet);
+    const events = createdMedia;
     if (events.length > 0) {
       const newEvents = await blockNumberToUnix(this.web3, events);
       const mergedEvents = mergeMediaEvents(
@@ -108,49 +101,94 @@ class Home extends Component {
 
   async getEventItems() {
     for (const event of this.state.mediaEvents) {
-      if (event.event === "MediaCreated") {
-        const rawMedia = await this.contracts.MediaFactory.methods
-          .getMedia(event.hash)
-          .call();
-        const parsedMedia = parseRawMedia(rawMedia);
-        report(event.event, parsedMedia);
-        this.setState({
-          media: parsedMedia
-        });
-      } else if (event.event === "PeriodCreated") {
-        const rawPeriod = await this.contracts.MediaFactory.methods
-          .getPeriod(event.hash)
-          .call();
-        const parsedPeriod = parseRawPeriod(rawPeriod);
-        report(event.event, parsedPeriod);
-        this.setState({
-          period: parsedPeriod
-        });
-      } else if (event.event === "AdaptionSetCreated") {
-        const rawAdaptionSet = await this.contracts.MediaFactory.methods
-          .getAdaptionSet(event.hash)
-          .call();
-        const parsedAdaptionSet = parseRawAdaptionSet(rawAdaptionSet);
-        report(event.event, parsedAdaptionSet);
-        this.setState({
-          adaptionSet: parsedAdaptionSet
-        });
-      } else if (event.event === "RepresentationSetCreated") {
-        const rawRepresentationSet = await this.contracts.MediaFactory.methods
-          .getRepresentationSet(event.hash)
-          .call();
-        const parsedRepresentationSet = parseRawRepresentationSet(
-          rawRepresentationSet
-        );
-        report(event.event, parsedRepresentationSet);
-        this.setState({
-          representationSet: parsedRepresentationSet
-        });
-      }
+      const rawMedia = await this.contracts.MediaFactory.methods
+        .getMedia(event.hash)
+        .call();
+      const parsedMedia = parseRawMedia(rawMedia);
+      this.getAdaptionSet(parsedMedia, event.hash);
+      report(event.event, parsedMedia);
+      this.setState({
+        media: parsedMedia
+      });
+      console.log(this.state.media);
     }
   }
 
-  prepareXML() {
+  async getAdaptionSet(media, hash) {
+    var promises = [];
+    for (var i = 0; i < media.numAdaptionSets; i++) {
+      promises.push(
+        this.contracts.MediaFactory.methods.getAdaptionSet(hash, i).call()
+      );
+    }
+
+    const results = await Promise.all(promises);
+    for (const rawAdaptionSet of results) {
+      const parsedAdaptionSet = parseRawAdaptionSet(rawAdaptionSet);
+      this.state.media.adaptionSet.push(parsedAdaptionSet);
+      this.getRepresentations(
+        parsedAdaptionSet.mediaHash,
+        parsedAdaptionSet.numAdaptionSet,
+        parsedAdaptionSet.numRepresentation
+      );
+      this.getSegmentTemplate(
+        parsedAdaptionSet.mediaHash,
+        parsedAdaptionSet.numAdaptionSet
+      );
+      this.getAudioChannelConfiguration(
+        parsedAdaptionSet.mediaHash,
+        parsedAdaptionSet.numAdaptionSet
+      );
+    }
+    this.setState({ loadingAdaptionSetDone: true });
+  }
+
+  async getRepresentations(mediaHash, numAdaptionSet, numRepresentation) {
+    var promises = [];
+    for (var i = 0; i < numRepresentation; i++) {
+      promises.push(
+        this.contracts.MediaFactory.methods
+          .getRepresentationSet(mediaHash, numAdaptionSet, i)
+          .call()
+      );
+    }
+    const results = await Promise.all(promises);
+    for (const rawRepresentation of results) {
+      const parsedRepresentation = parseRawRepresentation(rawRepresentation);
+      this.state.media.adaptionSet[numAdaptionSet].representationSet.push(
+        parsedRepresentation
+      );
+    }
+    this.setState({ loadingRepresentationSetDone: true });
+  }
+
+  async getSegmentTemplate(mediaHash, numAdaptionSet) {
+    const rawSegmentTemplate = await this.contracts.MediaFactory.methods
+      .getSegmentTemplate(mediaHash, numAdaptionSet)
+      .call();
+    const parsedSegmentTemplate = parseRawSegmentTemplate(rawSegmentTemplate);
+    this.state.media.adaptionSet[numAdaptionSet].segmentTemplateSet.push(
+      parsedSegmentTemplate
+    );
+    this.setState({ loadingSegmentTemplateDone: true });
+  }
+
+  async getAudioChannelConfiguration(mediaHash, numAdaptionSet) {
+    const rawAudioChannelConfiguration = await this.contracts.MediaFactory.methods
+      .getAudioChannelConfiguration(mediaHash, numAdaptionSet)
+      .call();
+    const parsedAudioChannelConfiguration = parseRawAudioChannelConfiguration(
+      rawAudioChannelConfiguration
+    );
+
+    this.state.media.adaptionSet[
+      numAdaptionSet
+    ].audioChannelConfigurationSet.push(parsedAudioChannelConfiguration);
+
+    this.setState({ loadingaudioChannelConfigurationSetDone: true });
+  }
+
+  /*prepareXML() {
     console.log("Building Manifest!");
     const xml = createXML(
       this.state.media.title,
@@ -170,6 +208,12 @@ class Home extends Component {
       this.state.representationSet.duration,
       this.state.representationSet.SegmentURL
     );
+    var manifest = js2XMLparser.parse("MPD", xml);
+    return manifest;
+  }*/
+
+  prepareXML(object) {
+    const xml = createXMLManifest(object);
     var manifest = js2XMLparser.parse("MPD", xml);
     return manifest;
   }
