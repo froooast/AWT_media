@@ -15,7 +15,7 @@ IPFS (especially the local browser node) is alpha software. Fetching the initial
 ![Architecture](/demo/architecture.png)
 
 In this repo you find the following components:
-1. The Manifest Storage Smart Contract is available under /contracts/MediaFactory.sol
+1. The Manifest Storage Smart Contract is available [here](contracts/MediaFactory.sol).
 2. It is filled with data when it is published to the blockchain (migrated). The respective code is in /migrations/2_deploy_contracts.js
 3. The Frontend is a React application and uses Shaka Player. It connects to the Blockchain through Web3, which is provided by MetaMask. The frontend uses drizzle, a framework which provides a higher level API and state management when communicating with smart contracts.
 4. The ManifestParser component can be found under /src/util/parser.js
