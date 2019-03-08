@@ -8,7 +8,7 @@ module.exports = async deployer => {
   deployer
     .deploy(MediaFactory)
     .then(() => MediaFactory.deployed())
-    /*.then(instance => {
+    .then(instance => {
       instance.createMedia(
         "period0",
         "PT193.680S",
@@ -184,5 +184,5 @@ module.exports = async deployer => {
         "0x09b6db57b3cf77a1c01afbba9cab66dce7ea0b9e1e34bb1455b12c111c84d015",
         1
       );
-    });*/
+    });
 };
