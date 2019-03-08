@@ -16,12 +16,12 @@ IPFS (especially the local browser node) is alpha software. Fetching the initial
 
 In this repo you find the following components:
 1. The Manifest Storage Smart Contract is available [here](contracts/MediaFactory.sol).
-2. It is filled with data when it is published to the blockchain (migrated). The respective code is in /migrations/2_deploy_contracts.js
+2. It is filled with data when it is published to the blockchain (migrated). The respective code is in [here](migrations/2_deploy_contracts.js).
 3. The Frontend is a React application and uses Shaka Player. It connects to the Blockchain through Web3, which is provided by MetaMask. The frontend uses drizzle, a framework which provides a higher level API and state management when communicating with smart contracts.
-4. The ManifestParser component can be found under /src/util/parser.js
-5. The Manifest Provider can be found under /src/util/localManifestProvider.js
-6. The Virtual IPFS Gateway can be found under /src/util/virtualIPFSGateway.js
-7. Shake Player is wrapped in a react componetn under /src/components/player/Player.js
+4. The ManifestParser component can be found [here](src/util/parser.js)
+5. The Manifest Provider can be found [here](src/util/localManifestProvider.js)
+6. The Virtual IPFS Gateway can be found [here](src/util/virtualIPFSGateway.js)
+7. Shake Player is wrapped in a react component [here](src/components/player/Player.js)
 
 ## Requirements
 
